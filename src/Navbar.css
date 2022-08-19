@@ -1,0 +1,40 @@
+.navbar{
+    display: flex;
+    background-color: black;
+    color: white;
+    padding: 20px;
+}
+.logo{
+    display: flex;
+}
+.logo img{
+    height: 40px;
+    width: 40px;
+    margin: -12px 2px;
+    padding: 2px 2px;
+}
+.logo a{
+    text-decoration: none;
+    color: white;
+    font-size: 30px;
+    font-weight: 90px;
+    margin: 2px 10px;
+    padding: 2px 20px;
+    /* background-color: #1DB954; */
+    /* border-radius: 99px; */
+}
+.search{
+    position: absolute;
+    left: 30%;
+    margin: 5px 0px;
+    /* padding: 2px 100px; */
+}
+.search input{
+    width: 900px;
+    padding: 7px;
+}
+@media (min-width:390px) and (max-width:1200px){
+    .search{
+        display: none;
+    }
+}

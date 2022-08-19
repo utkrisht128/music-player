@@ -1,0 +1,693 @@
+.main {
+    display: flex;
+}
+
+.playlist {
+    height: 600px;
+    width: 500px;
+    overflow: hidden;
+    /* overflow-y: scroll; */
+}
+
+.playlist .grid {
+    display: grid;
+    padding: 20px;
+    row-gap: 20px;
+}
+
+.playlist .grid .item {
+    /* border: 2px solid white; */
+    margin: 10px 2px;
+    height: 60px;
+    width: 490px;
+}
+.artist {
+    font-size: 14px;
+    margin: 2px 20px;
+}
+
+.playlist .grid .item:hover {
+    cursor: pointer;
+    border: 2px solid white;
+    width: 450px;
+    /* color: blue; */
+    font-size: 20px;
+    font-weight: 400;
+    transition: 0.2s ease-out;
+}
+
+.curentsong {
+    width: 1100px;
+    height: 600px;
+    background: #ad5389;
+    background: -webkit-linear-gradient(to right, #3c1053, #ad5389);
+    background: linear-gradient(to right, #3c1053, #ad5389);
+}
+.curentsong1 {
+    width: 1100px;
+    height: 600px;
+    background: #c31432;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #240b36, #c31432);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #240b36, #c31432); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    
+}
+.curentsong2 {
+    width: 1100px;
+    height: 600px;
+    background: #20002c;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #cbb4d4, #20002c);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #cbb4d4, #20002c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+.curentsong3 {
+    width: 1100px;
+    height: 600px;
+    background: #333333;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #dd1818, #333333);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #dd1818, #333333); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+.curentsong4 {
+    width: 1100px;
+    height: 600px;
+    background: #1f4037;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #99f2c8, #1f4037);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #99f2c8, #1f4037); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+
+}
+.curentsong .playing{
+    margin: 5px 400px;
+    width: 600px;
+}
+.curentsong1 .playing{
+    margin: 5px 400px;
+    width: 600px;
+}
+.curentsong2 .playing{
+    margin: 5px 400px;
+    width: 600px;
+}
+.curentsong3 .playing{
+    margin: 5px 400px;
+    width: 600px;
+}
+.curentsong4 .playing{
+    margin: 5px 400px;
+    width: 600px;
+}
+
+.curentsong .bg {
+    height: 260px;
+}
+.curentsong1 .bg {
+    height: 260px;
+}
+.curentsong2 .bg {
+    height: 260px;
+}
+.curentsong3 .bg {
+    height: 260px;
+}
+.curentsong4 .bg {
+    height: 260px;
+}
+
+.curentsong .song {
+    height: 330px;
+}
+.curentsong1 .song {
+    height: 330px;
+}
+.curentsong2 .song {
+    height: 330px;
+}
+.curentsong3 .song {
+    height: 330px;
+}
+.curentsong4 .song {
+    height: 330px;
+}
+
+.curentsong img {
+    position: absolute;
+    top: 32%;
+    margin: 2px 40px;
+    height: 250px;
+    width: 250px;
+}
+.curentsong1 img {
+    position: absolute;
+    top: 32%;
+    margin: 2px 40px;
+    height: 250px;
+    width: 250px;
+}
+.curentsong2 img {
+    position: absolute;
+    top: 32%;
+    margin: 2px 40px;
+    height: 250px;
+    width: 250px;
+}
+.curentsong3 img {
+    position: absolute;
+    top: 32%;
+    margin: 2px 40px;
+    height: 250px;
+    width: 250px;
+}
+.curentsong4 img {
+    position: absolute;
+    top: 32%;
+    margin: 2px 40px;
+    height: 250px;
+    width: 250px;
+}
+
+.controls {
+    background-color: #0f0f18;
+    display: flex;
+    height: 65px;
+}
+
+.music-controls img {
+    height: 20px;
+    width: 20px;
+    margin: 2px 9px;
+}
+
+.music-controls #btn-p {
+    position: absolute;
+    left: 45%;
+    margin: 40px 2px;
+}
+
+.music-controls #btn-n {
+    position: absolute;
+    left: 48%;
+    margin: 40px 2px;
+}
+
+.music-controls #btn-pr {
+    position: absolute;
+    left: 42%;
+    margin: 40px 2px;
+}
+
+.music-controls #btn-l {
+    position: absolute;
+    right: 12%;
+    margin: 13px 2px;
+}
+
+.music-controls #btn-v {
+    position: absolute;
+    right: 9%;
+    margin: 13px 2px;
+}
+
+.music-controls input {
+    width: 1200px;
+    margin: 15px 120px;
+}
+
+.music-controls #start {
+    position: absolute;
+    left: 8%;
+    margin: -18px 2px;
+}
+
+.music-controls #end {
+    position: absolute;
+    right: 17%;
+    margin: -18px 2px;
+}
+
+.vol-controls input {
+    width: 120px;
+    margin: 15px 2px;
+}
+@media (min-width:1500px) and (max-width:1570px){
+    .controls .music-controls input{
+        width: 1100px;
+    }
+    .music-controls #end {
+        position: absolute;
+        right: 22%;
+        margin: -18px 2px;
+    }
+    .music-controls #btn-l {
+        position: absolute;
+        right: 17%;
+        margin: 13px 2px;
+    }
+    
+    .music-controls #btn-v {
+        position: absolute;
+        right: 13%;
+        margin: 13px 4px;
+    }
+}
+
+@media (min-width:1473px) and (max-width: 1500px){
+    .controls .music-controls input{
+        width: 900px;
+    }
+    .music-controls #end {
+        position: absolute;
+        right: 32%;
+        margin: -18px 2px;
+    }
+    .music-controls #btn-l {
+        position: absolute;
+        right: 27%;
+        margin: 13px 2px;
+    }
+    
+    .music-controls #btn-v {
+        position: absolute;
+        right: 23%;
+        margin: 13px 4px;
+    }
+    .music-controls #btn-p {
+        position: absolute;
+        left: 40%;
+        margin: 40px 2px;
+    }
+    
+    .music-controls #btn-n {
+        position: absolute;
+        left: 45%;
+        margin: 40px 2px;
+    }
+    
+    .music-controls #btn-pr {
+        position: absolute;
+        left: 35%;
+        margin: 40px 2px;
+    }
+    
+}
+@media (min-width:1400px) and (max-width:1466px){
+    .music-controls input {
+        width: 1200px;
+        margin: 15px 320px;
+    }
+    .controls .music-controls input{
+        width: 600px;
+    }
+    .music-controls #end {
+        position: absolute;
+        right: 23%;
+        margin: -18px 200px;
+    }
+    .music-controls #start {
+        position: absolute;
+        left: 10%;
+        margin: -18px 190px;
+    }
+    .music-controls #btn-l {
+        position: absolute;
+        right: 18%;
+        margin: 13px 150px;
+    }
+    
+    .music-controls #btn-v {
+        position: absolute;
+        right: 14%;
+        margin: 13px 20px;
+    }
+    .music-controls #btn-p {
+        position: absolute;
+        left: 42%;
+        margin: 40px 2px;
+    }
+    
+    .music-controls #btn-n {
+        position: absolute;
+        left: 45%;
+        margin: 40px 2px;
+    }
+    
+    .music-controls #btn-pr {
+        position: absolute;
+        left: 38%;
+        margin: 40px 2px;
+    }
+    .curentsong {
+        width: 900px;
+        height: 600px;
+        background: #ad5389;
+        background: -webkit-linear-gradient(to right, #3c1053, #ad5389);
+        background: linear-gradient(to right, #3c1053, #ad5389);
+    }
+}
+@media (min-width:1300px) and (max-width:1400px){
+    .music-controls input {
+        width: 1200px;
+        margin: 15px 320px;
+    }
+    .controls .music-controls input{
+        width: 600px;
+    }
+    .music-controls #end {
+        position: absolute;
+        right: 23%;
+        margin: -18px 120px;
+    }
+    .music-controls #start {
+        position: absolute;
+        left: 10%;
+        margin: -18px 190px;
+    }
+    .music-controls #btn-l {
+        position: absolute;
+        right: 10%;
+        margin: 13px 130px;
+    }
+    
+    .music-controls #btn-v {
+        position: absolute;
+        right: 15%;
+        margin: 13px 2px;
+    }
+    .music-controls #btn-p {
+        position: absolute;
+        left: 44%;
+        margin: 40px 2px;
+    }
+    
+    .music-controls #btn-n {
+        position: absolute;
+        left: 48%;
+        margin: 40px 2px;
+    }
+    
+    .music-controls #btn-pr {
+        position: absolute;
+        left: 40%;
+        margin: 40px 2px;
+    }
+    .vol-controls input {
+        width: 120px;
+        margin: 15px -50px;
+    }
+    .curentsong {
+        width: 900px;
+        height: 600px;
+        background: #ad5389;
+        background: -webkit-linear-gradient(to right, #3c1053, #ad5389);
+        background: linear-gradient(to right, #3c1053, #ad5389);
+    }
+}
+@media (min-width:1200px) and (max-width:1300px){
+    .controls {
+        background-color: #0f0f18;
+        display: flex;
+        height: 65px;
+        width: 1365px;
+    }
+    .music-controls input {
+        width: 1200px;
+        margin: 15px 320px;
+    }
+    .controls .music-controls input{
+        width: 600px;
+    }
+    .music-controls #end {
+        position: absolute;
+        right: 21%;
+        margin: -18px 90px;
+    }
+    .music-controls #start {
+        position: absolute;
+        left: 10%;
+        margin: -18px 190px;
+    }
+    .music-controls #btn-l {
+        position: absolute;
+        right: 10%;
+        margin: 13px 90px;
+    }
+    
+    .music-controls #btn-v {
+        position: absolute;
+        right: 8%;
+        margin: 13px 2px;
+    }
+    .music-controls #btn-p {
+        position: absolute;
+        left: 44%;
+        margin: 40px 2px;
+    }
+    
+    .music-controls #btn-n {
+        position: absolute;
+        left: 48%;
+        margin: 40px 2px;
+    }
+    
+    .music-controls #btn-pr {
+        position: absolute;
+        left: 40%;
+        margin: 40px 2px;
+    }
+    .vol-controls input {
+        width: 120px;
+        margin: 15px -50px;
+    }
+    .curentsong {
+        width: 700px;
+        height: 600px;
+        background: #ad5389;
+        background: -webkit-linear-gradient(to right, #3c1053, #ad5389);
+        background: linear-gradient(to right, #3c1053, #ad5389);
+    }
+}
+@media (min-width:390px) and (max-width:1200px){
+    .playlist {
+        height: 600px;
+        width: 450px;
+        overflow: hidden;
+        /* overflow-y: scroll; */
+    }
+    .playlist .grid {
+        display: grid;
+        padding: 20px;
+        row-gap: 20px;
+    }
+    
+    .playlist .grid .item {
+        /* border: 2px solid white; */
+        margin: 15px 2px;
+        height: 80px;
+        width: 350px;
+    }
+    .playlist .grid .item:hover {
+        cursor: pointer;
+        border: 2px solid white;
+        width: 360px;
+        /* color: blue; */
+        font-size: 20px;
+        font-weight: 400;
+        transition: 0.2s ease-out;
+    }
+    .controls {
+        background-color: #0f0f18;
+        display: flex;
+        position: absolute;
+        bottom: 0%;
+        height: 90px;
+        width: 400px;
+    }
+    .controls .music-controls input{
+        margin: 15px 90px;
+        width: 220px;
+    }
+    .music-controls #end {
+        position: absolute;
+        right: 8%;
+        margin: -18px 50px;
+    }
+    .music-controls #start {
+        position: absolute;
+        left: 10%;
+        margin: -18px 60px;
+    }
+    .music-controls #btn-l {
+        position: absolute;
+        right: 7%;
+        margin: 13px 20px;
+    }
+    
+    .music-controls #btn-v {
+        display: none;
+        position: absolute;
+        right: 8%;
+        margin: 13px 2px;
+    }
+    .music-controls #btn-p {
+        position: absolute;
+        left: 48%;
+        margin: 50px 2px;
+    }
+    
+    .music-controls #btn-n {
+        position: absolute;
+        left: 57%;
+        margin: 50px 2px;
+    }
+    
+    .music-controls #btn-pr {
+        position: absolute;
+        left: 35%;
+        margin: 50px 2px;
+    }
+    .vol-controls input {
+        display: none;
+        width: 120px;
+        margin: 15px -50px;
+    }
+    .curentsong {
+        position: absolute;
+        bottom: 11%;
+        width: 400px;
+        height: 50px;
+        background: #ad5389;
+        background: -webkit-linear-gradient(to right, #3c1053, #ad5389);
+        background: linear-gradient(to right, #3c1053, #ad5389);
+    }
+    .curentsong1 {
+        position: absolute;
+        bottom: 11%;
+        width: 400px;
+        height: 50px;
+        background: #c31432;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #240b36, #c31432);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #240b36, #c31432); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        
+    }
+    .curentsong2 {
+        position: absolute;
+        bottom: 11%;
+        width: 400px;
+        height: 50px;
+        background: #20002c;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to bottom, #cbb4d4, #20002c);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to bottom, #cbb4d4, #20002c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+    .curentsong3 {
+        position: absolute;
+        bottom: 11%;
+        width: 400px;
+        height: 50px;
+        background: #333333;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to bottom, #dd1818, #333333);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to bottom, #dd1818, #333333); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    
+    }
+    .curentsong4 {
+        position: absolute;
+        bottom: 11%;
+        width: 400px;
+        height: 50px;
+        background: #1f4037;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to bottom, #99f2c8, #1f4037);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to bottom, #99f2c8, #1f4037); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    
+    }
+    .curentsong .playing{
+        margin: -20px 100px;
+        width: 250px;
+        font-size: 10px;
+    }
+    .curentsong1 .playing{
+        margin: -20px 100px;
+        width: 250px;
+        font-size: 10px;
+    }
+    .curentsong2 .playing{
+        margin: -20px 100px;
+        width: 250px;
+        font-size: 10px;
+    }
+    .curentsong3 .playing{
+        margin: -20px 100px;
+        width: 250px;
+        font-size: 10px;
+    }
+    .curentsong4 .playing{
+        margin: -20px 100px;
+        width: 250px;
+        font-size: 10px;
+    }
+    
+    .curentsong .bg {
+        height: 20px;
+    }
+    .curentsong1 .bg {
+        height: 20px;
+    }
+    .curentsong2 .bg {
+        height: 20px;
+    }
+    .curentsong3 .bg {
+        height: 20px;
+    }
+    .curentsong4 .bg {
+        height: 20px;
+    }
+    
+    .curentsong .song {
+        height: 30px;
+    }
+    .curentsong1 .song {
+        height: 30px;
+    }
+    .curentsong2 .song {
+        height: 30px;
+    }
+    .curentsong3 .song {
+        height: 30px;
+    }
+    .curentsong4 .song {
+        height: 30px;
+    }
+    
+    .curentsong img {
+        position:absolute;
+        top: 7%;
+        margin: 2px 40px;
+        height: 40px;
+        width: 40px;
+    }
+    .curentsong1 img {
+        position:absolute;
+        top: 7%;
+        margin: 2px 40px;
+        height: 40px;
+        width: 40px;
+    }
+    .curentsong2 img {
+        position:absolute;
+        top: 7%;
+        margin: 2px 40px;
+        height: 40px;
+        width: 40px;
+    }
+    .curentsong3 img {
+        position:absolute;
+        top: 7%;
+        margin: 2px 40px;
+        height: 40px;
+        width: 40px;
+    }
+    .curentsong4 img {
+        position:absolute;
+        top: 7%;
+        margin: 2px 40px;
+        height: 40px;
+        width: 40px;
+    }
+}
