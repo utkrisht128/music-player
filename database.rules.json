@@ -1,0 +1,52 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$code": {
+        // Anyone signed in who knows the code can see the room.
+        ".read": "auth != null",
+        // Create (as its host) or delete (only the host). Nothing else at this level.
+        ".write": "auth != null && ((!data.exists() && newData.child('hostUid').val() === auth.uid) || (data.child('hostUid').val() === auth.uid && !newData.exists()))",
+        ".validate": "$code.matches(/^[A-Z0-9]{6}$/)",
+        "hostUid": { ".validate": "newData.isString()" },
+        "createdAt": { ".validate": "newData.isNumber()" },
+        "state": {
+          // Only the host drives playback.
+          ".write": "auth != null && data.parent().child('hostUid').val() === auth.uid",
+          "trackId": { ".validate": "newData.isString() && newData.val().length <= 64" },
+          "isPlaying": { ".validate": "newData.isBoolean()" },
+          "position": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+          "updatedAt": { ".validate": "newData.isNumber()" },
+          "track": {
+            "id": { ".validate": "newData.isString()" },
+            "title": { ".validate": "newData.isString() && newData.val().length <= 300" },
+            "artwork": { ".validate": "newData.isString() && newData.val().length <= 1000" },
+            "artists": { "$i": { ".validate": "newData.isString()" } },
+            "source": { ".validate": "newData.isString()" },
+            "videoId": { ".validate": "newData.isString() && newData.val().length <= 32" },
+            "src": { ".validate": "newData.isString() && newData.val().length <= 1000" },
+            "albumTitle": { ".validate": "newData.isString() && newData.val().length <= 300" },
+            "channel": { ".validate": "newData.isString() && newData.val().length <= 300" },
+            "duration": { ".validate": "newData.isNumber()" },
+            "published": { ".validate": "newData.isString() || newData.isNumber()" },
+            "$other": { ".validate": false }
+          },
+          "$other": { ".validate": false }
+        },
+        "members": {
+          // Each listener adds or removes only themselves; the host can remove anyone.
+          "$uid": {
+            ".write": "auth != null && (auth.uid === $uid || data.parent().parent().child('hostUid').val() === auth.uid)",
+            ".validate": "newData.hasChildren(['name'])",
+            "name": { ".validate": "newData.isString() && newData.val().length <= 100" },
+            "photo": { ".validate": "newData.isString()" },
+            "joinedAt": { ".validate": "newData.isNumber()" },
+            "$other": { ".validate": false }
+          }
+        },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}

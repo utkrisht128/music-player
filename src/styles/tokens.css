@@ -1,0 +1,66 @@
+/* Design tokens. Single source of truth for colour, spacing, radius, motion. */
+:root {
+  /* Surfaces */
+  --bg: #000000;
+  --bg-elevated: #121212;
+  --surface: #181818;
+  --surface-hover: #232323;
+  --surface-active: #2a2a2a;
+  --surface-glass: rgba(24, 24, 24, 0.72);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Text */
+  --text: #ffffff;
+  --text-muted: #a7a7a7;
+  --text-faint: #6a6a6a;
+
+  /* Accent — used sparingly: active state, play, progress, primary action */
+  --accent: #1db954;
+  --accent-hover: #1ed760;
+  --accent-press: #169c46;
+  --accent-contrast: #000000;
+
+  --danger: #e0245e;
+  --like: #1db954;
+
+  /* Spacing scale */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
+
+  /* Radius */
+  --r-sm: 4px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px; --r-pill: 999px;
+
+  /* Type */
+  --font: "Circular Std", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --fs-xs: 11px; --fs-sm: 13px; --fs-md: 14px; --fs-lg: 16px;
+  --fs-xl: 22px; --fs-2xl: 32px; --fs-3xl: 48px;
+
+  /* Elevation */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
+
+  /* Motion */
+  --ease: cubic-bezier(0.3, 0, 0.2, 1);
+  --t-fast: 120ms; --t-med: 220ms; --t-slow: 380ms;
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --player-h: 88px;
+  --mobile-nav-h: 60px;
+  --mobile-player-h: 60px;
+  --z-player: 60; --z-nav: 70; --z-panel: 80;
+  --z-menu: 90; --z-modal: 100; --z-toast: 110;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-fast: 0ms; --t-med: 0ms; --t-slow: 0ms; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

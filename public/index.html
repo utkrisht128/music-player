@@ -2,42 +2,71 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/spotify.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Resonate – Free Online Music Player</title>
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Resonate is a free online music player: search songs and music videos, build playlists, follow synced lyrics and pick music by mood."
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/spotify.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/spotify.png" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://spotifyclone128.web.app/" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="application-name" content="Resonate" />
+    <meta name="apple-mobile-web-app-title" content="Resonate" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>Spotify-Love For Music</title>
+    <!-- Social previews -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Resonate" />
+    <meta property="og:title" content="Resonate – Free Online Music Player" />
+    <meta
+      property="og:description"
+      content="Search songs and music videos, build playlists, follow synced lyrics and pick music by mood."
+    />
+    <meta property="og:url" content="https://spotifyclone128.web.app/" />
+    <meta property="og:image" content="https://spotifyclone128.web.app/logo512.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Resonate – Free Online Music Player" />
+    <meta
+      name="twitter:description"
+      content="Search songs and music videos, build playlists, follow synced lyrics and pick music by mood."
+    />
+    <meta name="twitter:image" content="https://spotifyclone128.web.app/logo512.png" />
+
+    <link rel="icon" href="%PUBLIC_URL%/spotify.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="preconnect" href="https://www.youtube.com" />
+    <link rel="preconnect" href="https://i.ytimg.com" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Resonate",
+        "url": "https://spotifyclone128.web.app/",
+        "description": "A free online music player with search, music videos, playlists, synced lyrics and mood-based picks.",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://spotifyclone128.web.app/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <h1>Resonate – Free Online Music Player</h1>
+      <p>
+        Search songs and music videos, build playlists, follow synced lyrics and pick music by mood.
+        Please enable JavaScript to use Resonate.
+      </p>
+    </noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>

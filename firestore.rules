@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each signed-in user can read and write only their own library.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Collaborative playlists. The random id in the invite link is the secret:
+    // anyone signed in can open one by id, but only members can list them.
+    match /sharedPlaylists/{pid} {
+      function signedIn() { return request.auth != null; }
+      function me() { return request.auth.uid; }
+      function isMember() { return me() in resource.data.members; }
+      function isOwner() { return resource.data.ownerUid == me(); }
+      function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+      function contentKeys() { return ['name', 'description', 'artwork', 'trackIds', 'tracks', 'updatedAt']; }
+      function memberKeys() { return ['members', 'memberInfo', 'updatedAt']; }
+      function newMembers() { return request.resource.data.members.toSet(); }
+      function oldMembers() { return resource.data.members.toSet(); }
+
+      allow get: if signedIn();
+      allow list: if signedIn() && me() in resource.data.members;
+
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == me()
+        && request.resource.data.members == [me()];
+
+      allow update: if signedIn() && request.resource.data.ownerUid == resource.data.ownerUid && (
+        // Owner: anything (edit, remove members), but the owner stays a member.
+        (isOwner() && me() in request.resource.data.members)
+        // Member: edit songs and details.
+        || (isMember() && changed().hasOnly(contentKeys()))
+        // Member: leave (remove only themselves).
+        || (isMember() && !isOwner() && changed().hasOnly(memberKeys())
+            && newMembers() == oldMembers().difference([me()].toSet()))
+        // Anyone with the link: join (add only themselves).
+        || (!isMember() && changed().hasOnly(memberKeys())
+            && newMembers() == oldMembers().union([me()].toSet()))
+      );
+
+      allow delete: if signedIn() && isOwner();
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

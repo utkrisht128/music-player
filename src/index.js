@@ -1,22 +1,41 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { createRoot } from 'react-dom/client';
+import React from "react";
+import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import App from "./App";
+import { UIProvider } from "./state/UIContext";
+import { AuthProvider } from "./state/AuthContext";
+import { LibraryProvider } from "./state/LibraryContext";
+import { PlayerProvider } from "./state/PlayerContext";
+import { RoomProvider } from "./state/RoomContext";
+import { SettingsProvider } from "./state/SettingsContext";
+import reportWebVitals from "./reportWebVitals";
+import "./styles/global.css";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+/**
+ * Provider order matters: PlayerProvider reads from both LibraryContext
+ * (to record plays) and UIContext (to raise playback toasts), so it must sit
+ * inside them. RoomProvider drives the player, so it sits inside PlayerProvider.
+ */
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
-  <BrowserRouter>
-  <Routes>
-  <Route path="/" element={<App />} />
-  </Routes>
-  </BrowserRouter>
+  <React.StrictMode>
+    <BrowserRouter>
+      <SettingsProvider>
+        <UIProvider>
+          <AuthProvider>
+            <LibraryProvider>
+              <PlayerProvider>
+                <RoomProvider>
+                  <App />
+                </RoomProvider>
+              </PlayerProvider>
+            </LibraryProvider>
+          </AuthProvider>
+        </UIProvider>
+      </SettingsProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
