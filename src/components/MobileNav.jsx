@@ -6,7 +6,9 @@ import { useAuth } from "../state/AuthContext";
 const TABS = [
   { to: "/", end: true, icon: "home", label: "Home" },
   { to: "/search", icon: "search", label: "Search" },
+  { to: "/ai", icon: "sparkle", label: "AI", className: "mobile-nav__link--ai" },
   { to: "/library", icon: "library", label: "Library" },
+  { to: "/friends", icon: "people", label: "Friends" },
   { to: "/local", icon: "upload", label: "Uploads" },
 ];
 
@@ -23,7 +25,12 @@ export default function MobileNav() {
   return (
     <nav className="mobile-nav" aria-label="Main">
       {TABS.map((tab) => (
-        <NavLink key={tab.to} to={tab.to} end={tab.end} className={linkClass}>
+        <NavLink
+          key={tab.to}
+          to={tab.to}
+          end={tab.end}
+          className={(state) => `${linkClass(state)}${tab.className ? ` ${tab.className}` : ""}`}
+        >
           <span className="mobile-nav__icon"><Icon name={tab.icon} size={22} /></span>
           <span>{tab.label}</span>
         </NavLink>

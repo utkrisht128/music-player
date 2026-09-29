@@ -78,6 +78,8 @@ export function PlayerProvider({ children }) {
   const [isRestoring, setIsRestoring] = useState(initial.queueIds.length > 0);
   // null | { at: epoch ms } | { endOfTrack: true }
   const [sleep, setSleep] = useState(null);
+  // { id, at }: seconds to jump to once that track starts (see playFrom).
+  const startAtRef = useRef(null);
 
   const currentTrack = queue[index] || null;
 
@@ -115,6 +117,13 @@ export function PlayerProvider({ children }) {
         setDuration(value);
         const track = stateRef.current.currentTrack;
         if (track) recordDuration(track.id, value);
+        // "Play the best part": jump once the length is known (YouTube only
+        // reports it after starting, so an earlier seek would be lost).
+        const pending = startAtRef.current;
+        if (pending && track?.id === pending.id) {
+          startAtRef.current = null;
+          if (pending.at > 0 && pending.at < value - 3) manager.seek(pending.at);
+        }
       }),
       manager.on("play", () => { setIsPlaying(true); setIsLoading(false); }),
       manager.on("pause", () => setIsPlaying(false)),
@@ -327,6 +336,32 @@ export function PlayerProvider({ children }) {
     [playAt, toast]
   );
 
+  /**
+   * Play a list starting part-way into one song, e.g. its chorus. If that
+   * song is already loaded, jump now; otherwise when its length is known.
+   */
+  const playFrom = useCallback(
+    (tracks, startIndex, seconds, label = null) => {
+      const track = tracks?.[startIndex];
+      if (!track) return;
+      const loaded = manager.currentSrc === track.src && stateRef.current.currentTrack?.id === track.id;
+      startAtRef.current = loaded ? null : { id: track.id, at: seconds };
+      if (loaded) {
+        setIsPlaying(true);
+        manager.seek(seconds);
+        manager.play();
+        return;
+      }
+      // Keep the chosen song first even with shuffle on.
+      setQueue(tracks);
+      setContextLabel(label);
+      stateRef.current.queue = tracks;
+      setIndex(startIndex);
+      setIsPlaying(true);
+    },
+    [manager]
+  );
+
   /** Play a list shuffled from the start, regardless of the shuffle toggle. */
   const shufflePlay = useCallback(
     (tracks, label = null) => {
@@ -536,7 +571,7 @@ export function PlayerProvider({ children }) {
       isPlaying, isLoading, isRestoring,
       currentTime, duration, contextLabel,
       volume, muted, shuffle, repeat,
-      playTracks, shufflePlay, playAt, togglePlay, skipNext, skipPrevious,
+      playTracks, playFrom, shufflePlay, playAt, togglePlay, skipNext, skipPrevious,
       seek, nudge, setVolume, toggleMute, toggleShuffle, cycleRepeat,
       playNext, addToQueue, removeFromQueue, moveInQueue, clearQueue,
       sleep, setSleepTimer,
@@ -544,7 +579,7 @@ export function PlayerProvider({ children }) {
     [
       manager, queue, index, currentTrack, isPlaying, isLoading, isRestoring,
       currentTime, duration, contextLabel, volume, muted, shuffle, repeat,
-      playTracks, shufflePlay, playAt, togglePlay, skipNext, skipPrevious,
+      playTracks, playFrom, shufflePlay, playAt, togglePlay, skipNext, skipPrevious,
       seek, nudge, setVolume, toggleMute, toggleShuffle, cycleRepeat,
       playNext, addToQueue, removeFromQueue, moveInQueue, clearQueue,
       sleep, setSleepTimer,

@@ -5,6 +5,8 @@ import { useLibrary } from "../state/LibraryContext";
 import { useUI } from "../state/UIContext";
 import { pluralize } from "../utils/format";
 import { useRoom } from "../state/RoomContext";
+import { useFriends } from "../state/FriendsContext";
+import { FriendRow } from "../pages/Friends";
 
 /**
  * Desktop navigation. Hidden below the tablet breakpoint, where MobileNav
@@ -15,6 +17,8 @@ export default function Sidebar() {
   const { playlists, createPlaylist, liked } = useLibrary();
   const { toast } = useUI();
   const { code: roomCode } = useRoom();
+  const { friends, requests, onlineCount } = useFriends();
+  const active = friends.filter((f) => f.online).slice(0, 4);
   const navigate = useNavigate();
 
   const newPlaylist = () => {
@@ -84,9 +88,12 @@ export default function Sidebar() {
         <li>
           <NavLink to="/ai" className={linkClass}>
             <span className="sidebar__tile sidebar__tile--ai">
-              <Icon name="radio" size={14} />
+              <Icon name="sparkle" size={14} />
             </span>
-            <span className="sidebar__tile-label">AI Playlist Maker</span>
+            <span className="sidebar__tile-label">
+              AI Song Finder
+              <small>Photo → perfect song</small>
+            </span>
           </NavLink>
         </li>
         <li>
@@ -101,6 +108,19 @@ export default function Sidebar() {
           </NavLink>
         </li>
         <li>
+          <NavLink to="/friends" className={linkClass}>
+            <span className="sidebar__tile sidebar__tile--friends">
+              <Icon name="artist" size={14} />
+            </span>
+            <span className="sidebar__tile-label">
+              Friends
+              {requests.length ? (
+                <small className="sidebar__live">{requests.length} new {requests.length === 1 ? "request" : "requests"}</small>
+              ) : friends.length ? <small>{onlineCount} online</small> : null}
+            </span>
+          </NavLink>
+        </li>
+        <li>
           <NavLink to="/local" className={linkClass}>
             <span className="sidebar__tile sidebar__tile--local">
               <Icon name="device" size={14} />
@@ -109,6 +129,15 @@ export default function Sidebar() {
           </NavLink>
         </li>
       </ul>
+
+      {active.length ? (
+        <section className="sidebar__friends" aria-label="Friend activity">
+          <h2 className="sidebar__friends-head">Friend activity</h2>
+          <ul className="friends__list">
+            {active.map((f) => <FriendRow key={f.uid} friend={f} compact />)}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="sidebar__playlists-head">
         <h2>Playlists</h2>

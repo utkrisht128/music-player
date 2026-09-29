@@ -7,6 +7,7 @@
  */
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider, ReCaptchaV3Provider } from "firebase/app-check";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 
 const config = {
@@ -29,6 +30,23 @@ let db = null;
 
 if (isFirebaseConfigured) {
   app = initializeApp(config);
+  // App Check proves requests come from this site, so nobody can spend the
+  // project's free quotas (Gemini, database) with the public config above.
+  // It must start before any other service sends a request.
+  // Either a reCAPTCHA Enterprise key (recommended) or a classic v3 key.
+  const enterpriseKey = process.env.REACT_APP_RECAPTCHA_ENTERPRISE_KEY;
+  const siteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
+  if (enterpriseKey || siteKey) {
+    // On localhost reCAPTCHA can't vouch for us; the SDK prints a debug token
+    // to the console instead, which you register once in the Firebase console.
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      window.FIREBASE_APPCHECK_DEBUG_TOKEN = process.env.REACT_APP_APPCHECK_DEBUG_TOKEN || true;
+    }
+    initializeAppCheck(app, {
+      provider: enterpriseKey ? new ReCaptchaEnterpriseProvider(enterpriseKey) : new ReCaptchaV3Provider(siteKey),
+      isTokenAutoRefreshEnabled: true,
+    });
+  }
   auth = getAuth(app);
   // Offline cache: changes made offline are queued and synced on reconnect.
   try {

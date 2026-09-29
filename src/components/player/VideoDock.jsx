@@ -38,9 +38,11 @@ function savePos(pos) {
  */
 export default function VideoDock({ large, stage, onToggleLarge }) {
   const { currentTrack, isPlaying } = usePlayer();
-  const [dismissed, setDismissed] = useState(false);
+  // The mini card stays hidden until playback starts (e.g. a track restored
+  // on page load should not pop up a video on its own).
+  const [dismissed, setDismissed] = useState(true);
   const active = currentTrack?.source === "youtube";
-  const mode = !active || dismissed ? "hidden" : stage ? "stage" : "mini";
+  const mode = !active ? "hidden" : stage ? "stage" : dismissed ? "hidden" : "mini";
 
   // User-chosen mini position (top-left, px); null = default bottom-right.
   const posRef = useRef(readPos());
@@ -59,11 +61,10 @@ export default function VideoDock({ large, stage, onToggleLarge }) {
     return () => header.remove();
   }, [header]);
 
-  // Playing again (or a new track) always brings a dismissed video back.
+  // Playing (again) always brings the video back.
   useEffect(() => {
     if (isPlaying) setDismissed(false);
-  }, [isPlaying]);
-  useEffect(() => setDismissed(false), [currentTrack?.id]);
+  }, [isPlaying, currentTrack?.id]);
 
   const layout = useCallback(() => {
     const dock = ensureHost().parentElement;

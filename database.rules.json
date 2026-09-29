@@ -4,13 +4,17 @@
     ".write": false,
     "rooms": {
       "$code": {
-        // Anyone signed in who knows the code can see the room.
-        ".read": "auth != null",
+        // Anyone signed in who knows the code, unless the host made it friends-only.
+        ".read": "auth != null && (data.child('visibility').val() !== 'friends' || data.child('hostUid').val() === auth.uid || root.child('friends/' + data.child('hostUid').val() + '/' + auth.uid).exists())",
         // Create (as its host) or delete (only the host). Nothing else at this level.
         ".write": "auth != null && ((!data.exists() && newData.child('hostUid').val() === auth.uid) || (data.child('hostUid').val() === auth.uid && !newData.exists()))",
         ".validate": "$code.matches(/^[A-Z0-9]{6}$/)",
         "hostUid": { ".validate": "newData.isString()" },
         "createdAt": { ".validate": "newData.isNumber()" },
+        "visibility": {
+          ".write": "auth != null && data.parent().child('hostUid').val() === auth.uid",
+          ".validate": "newData.val() === 'public' || newData.val() === 'friends'"
+        },
         "state": {
           // Only the host drives playback.
           ".write": "auth != null && data.parent().child('hostUid').val() === auth.uid",
@@ -37,13 +41,90 @@
         "members": {
           // Each listener adds or removes only themselves; the host can remove anyone.
           "$uid": {
-            ".write": "auth != null && (auth.uid === $uid || data.parent().parent().child('hostUid').val() === auth.uid)",
+            ".write": "auth != null && (data.parent().parent().child('hostUid').val() === auth.uid || (auth.uid === $uid && (!newData.exists() || data.parent().parent().child('visibility').val() !== 'friends' || root.child('friends/' + data.parent().parent().child('hostUid').val() + '/' + auth.uid).exists())))",
             ".validate": "newData.hasChildren(['name'])",
             "name": { ".validate": "newData.isString() && newData.val().length <= 100" },
             "photo": { ".validate": "newData.isString()" },
             "joinedAt": { ".validate": "newData.isNumber()" },
             "$other": { ".validate": false }
           }
+        },
+        "$other": { ".validate": false }
+      }
+    },
+    // Friends: see src/services/friends.js for the layout.
+    "profiles": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid",
+        "name": { ".validate": "newData.isString() && newData.val().length <= 100" },
+        "photo": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+        "username": { ".validate": "newData.isString() && root.child('usernames/' + newData.val()).val() === auth.uid" },
+        "$other": { ".validate": false }
+      }
+    },
+    "usernames": {
+      // Claim a free name or release your own. Lookups are by exact name.
+      "$name": {
+        ".read": "auth != null",
+        ".write": "auth != null && ((!data.exists() && newData.val() === auth.uid) || (data.val() === auth.uid && !newData.exists()))",
+        ".validate": "$name.matches(/^[a-z0-9_]{3,20}$/)"
+      }
+    },
+    "emails": {
+      // Look up one exact email; the list itself can't be read.
+      "$key": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.token.email != null && $key === auth.token.email.toLowerCase().replace('.', ',') && (!newData.exists() || newData.val() === auth.uid)"
+      }
+    },
+    "friendRequests": {
+      "$to": {
+        ".read": "auth != null && auth.uid === $to",
+        "$from": {
+          ".read": "auth != null && auth.uid === $from",
+          ".write": "auth != null && ((auth.uid === $from && $from !== $to && (!newData.exists() || !root.child('friends/' + $from + '/' + $to).exists())) || (auth.uid === $to && !newData.exists()))",
+          ".validate": "newData.hasChildren(['name', 'at'])",
+          "name": { ".validate": "newData.isString() && newData.val().length <= 100" },
+          "photo": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+          "at": { ".validate": "newData.isNumber()" },
+          "$other": { ".validate": false }
+        }
+      }
+    },
+    "sentRequests": {
+      "$from": {
+        ".read": "auth != null && auth.uid === $from",
+        "$to": {
+          ".write": "auth != null && (auth.uid === $from || (auth.uid === $to && !newData.exists()))",
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+    "friends": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$friend": {
+          // Either side can end a friendship; it starts only from a pending request.
+          ".read": "auth != null && auth.uid === $friend",
+          ".write": "auth != null && ((!newData.exists() && (auth.uid === $uid || auth.uid === $friend)) || (auth.uid === $uid && root.child('friendRequests/' + $uid + '/' + $friend).exists()) || (auth.uid === $friend && root.child('friendRequests/' + $friend + '/' + $uid).exists()))",
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+    "presence": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('friends/' + $uid + '/' + auth.uid).exists())",
+        ".write": "auth != null && auth.uid === $uid",
+        "connections": { "$id": { ".validate": "newData.val() === true" } },
+        "lastSeen": { ".validate": "newData.isNumber()" },
+        "isPlaying": { ".validate": "newData.isBoolean()" },
+        "roomCode": { ".validate": "newData.isString() && newData.val().matches(/^[A-Z0-9]{6}$/)" },
+        "roomHost": { ".validate": "newData.isBoolean()" },
+        "track": {
+          ".validate": "newData.hasChildren(['id'])",
+          "id": { ".validate": "newData.isString() && newData.val().length <= 200" },
+          "title": { ".validate": "newData.isString() && newData.val().length <= 300" }
         },
         "$other": { ".validate": false }
       }

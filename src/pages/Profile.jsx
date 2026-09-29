@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { deleteDoc, doc } from "firebase/firestore";
 import Icon from "../components/Icon";
 import SignInDialog from "../components/SignInDialog";
+import UsernameForm from "../components/UsernameForm";
+import { isRealtimeConfigured } from "../services/firebase";
 import { useAuth } from "../state/AuthContext";
 import { useLibrary } from "../state/LibraryContext";
 import { useUI } from "../state/UIContext";
@@ -198,6 +200,12 @@ export default function ProfilePage() {
         </section>
       ) : (
         <>
+          {!isGuest && isRealtimeConfigured ? (
+            <section className="settings__group">
+              <h2 className="settings__heading">Username</h2>
+              <UsernameForm />
+            </section>
+          ) : null}
           {!isGuest ? (
             <section className="settings__group">
               <div className="profile__section-head">

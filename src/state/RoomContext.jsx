@@ -6,7 +6,8 @@ import { useAuth } from "./AuthContext";
 import { useUI } from "./UIContext";
 import { getTrack } from "../services/musicService";
 import {
-  createRoom, endRoom, expectedPosition, isRealtimeConfigured, joinRoom, publishState, rememberRoomTrack, trackSnapshot,
+  createRoom, endRoom, expectedPosition, isRealtimeConfigured, joinRoom, publishState, rememberRoomTrack,
+  setRoomVisibility, trackSnapshot, VISIBILITY,
 } from "../services/rooms";
 import { track as trackEvent } from "../services/analytics";
 
@@ -65,7 +66,11 @@ export function RoomProvider({ children }) {
           reset();
         }
       }, () => {
-        toast("Lost connection to the room.", { tone: "error", icon: "warning" });
+        toast("You no longer have access to this room.", { tone: "error", icon: "warning" });
+        if (leaveRef.current === leaveFn) {
+          leaveFn();
+          reset();
+        }
       });
       if (!leaveFn) return false;
       leaveRef.current = leaveFn;
@@ -78,13 +83,19 @@ export function RoomProvider({ children }) {
     }
   }, [user, code, leave, reset, toast]);
 
-  const create = useCallback(async () => {
+  const create = useCallback(async (visibility = VISIBILITY.PUBLIC) => {
     if (!user) throw new Error("Sign in to listen together.");
-    const roomCode = await createRoom(user);
-    trackEvent("room_create");
+    const roomCode = await createRoom(user, visibility);
+    trackEvent("room_create", { visibility });
     await join(roomCode);
     return roomCode;
   }, [user, join]);
+
+  const visibility = room?.visibility || VISIBILITY.PUBLIC;
+  const setVisibility = useCallback(async (next) => {
+    if (!code || !isHost) return;
+    await setRoomVisibility(code, next);
+  }, [code, isHost]);
 
   const end = useCallback(async () => {
     const roomCode = code;
@@ -251,10 +262,11 @@ export function RoomProvider({ children }) {
   const value = useMemo(
     () => ({
       enabled: isRealtimeConfigured,
-      code, room, isHost, members, hostName, joining, needsTap,
-      create, join, leave, end, sync, hostPosition,
+      code, room, isHost, members, hostName, joining, needsTap, visibility,
+      create, join, leave, end, sync, hostPosition, setVisibility,
     }),
-    [code, room, isHost, members, hostName, joining, needsTap, create, join, leave, end, sync, hostPosition]
+    [code, room, isHost, members, hostName, joining, needsTap, visibility,
+      create, join, leave, end, sync, hostPosition, setVisibility]
   );
 
   return <RoomContext.Provider value={value}>{children}</RoomContext.Provider>;

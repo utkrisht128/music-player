@@ -54,7 +54,7 @@ function QuickAccess({ playlists, likedCount }) {
     { to: "/liked", label: "Liked Songs", icon: "heart", tone: "liked", hint: likedCount ? `${likedCount}` : null },
     { to: "/recent", label: "Recently Played", icon: "clock", tone: "recent" },
     { to: "/stats", label: "Your Stats", icon: "chart", tone: "stats" },
-    { to: "/ai", label: "AI Playlist Maker", icon: "radio", tone: "ai" },
+    { to: "/ai", label: "AI Song Finder", icon: "sparkle", tone: "ai" },
     { to: "/room", label: "Listen Together", icon: "people", tone: "room" },
     ...playlists.slice(0, 1).map((p) => ({ to: `/playlist/${p.id}`, label: p.name, artwork: p.artwork, icon: "music", tone: "playlist" })),
   ];

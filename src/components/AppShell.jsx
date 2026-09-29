@@ -8,6 +8,7 @@ import ToastStack from "./Toast";
 import ModalHost from "./Modal";
 import ContextMenuHost from "./ContextMenu";
 import ErrorBoundary from "./ErrorBoundary";
+import { UsernamePrompt } from "./UsernameForm";
 import { usePlayer } from "../state/PlayerContext";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 
@@ -46,6 +47,7 @@ export default function AppShell() {
       <div className="app__content">
         <TopBar scrollRef={scrollRef} />
         <main className="app__scroll" id="main" ref={scrollRef} tabIndex={-1}>
+          <UsernamePrompt />
           <ErrorBoundary resetKey={location.pathname}>
             <Outlet />
           </ErrorBoundary>

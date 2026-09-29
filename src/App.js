@@ -20,6 +20,7 @@ import SharedPlaylist from "./pages/SharedPlaylist";
 import JoinPlaylist from "./pages/JoinPlaylist";
 import AIPlaylist from "./pages/AIPlaylist";
 import Room from "./pages/Room";
+import Friends from "./pages/Friends";
 import "./styles/app.css";
 
 /**
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="ai" element={<AIPlaylist />} />
         <Route path="room" element={<Room />} />
         <Route path="room/:code" element={<Room />} />
+        <Route path="friends" element={<Friends />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

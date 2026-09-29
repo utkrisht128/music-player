@@ -9,7 +9,7 @@ import { useAuth } from "../state/AuthContext";
 import { useRoom } from "../state/RoomContext";
 import { usePlayer } from "../state/PlayerContext";
 import { useUI } from "../state/UIContext";
-import { normaliseCode } from "../services/rooms";
+import { normaliseCode, VISIBILITY } from "../services/rooms";
 import { shareLink } from "../utils/share";
 import { useSeo } from "../hooks/useSeo";
 
@@ -24,6 +24,7 @@ export default function RoomPage() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [visibility, setVisibility] = useState(VISIBILITY.PUBLIC);
   const wanted = normaliseCode(urlCode);
 
   // Opening an invite link joins that room.
@@ -32,7 +33,10 @@ export default function RoomPage() {
     setNotFound(false);
     room.join(wanted)
       .then((ok) => { if (!ok) setNotFound(true); })
-      .catch((e) => toast(e.message || "Couldn't join the room.", { tone: "error", icon: "warning" }));
+      .catch((e) => {
+        toast(e.message || "Couldn't join the room.", { tone: "error", icon: "warning" });
+        navigate("/room");
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wanted, user?.uid]);
 
@@ -61,7 +65,7 @@ export default function RoomPage() {
   const start = async () => {
     setBusy(true);
     try {
-      const code = await room.create();
+      const code = await room.create(visibility);
       navigate(`/room/${code}`);
     } catch (e) {
       toast(e.message || "Couldn't start a room.", { tone: "error", icon: "warning" });
@@ -94,6 +98,7 @@ export default function RoomPage() {
             <section className="room__card">
               <h2>Host a room</h2>
               <p>You control the music. Friends join with a code or link.</p>
+              <VisibilityPicker value={visibility} onChange={setVisibility} />
               <button type="button" className="btn btn--primary" onClick={start} disabled={busy}>
                 <Icon name="radio" size={16} /><span>{busy ? "Starting…" : "Start a room"}</span>
               </button>
@@ -134,7 +139,7 @@ export default function RoomPage() {
 
 function RoomSession() {
   const navigate = useNavigate();
-  const { code, room, isHost, members, leave, end, needsTap, sync } = useRoom();
+  const { code, room, isHost, members, leave, end, needsTap, sync, visibility, setVisibility } = useRoom();
   const { currentTrack, isPlaying } = usePlayer();
   const { toast } = useUI();
   const host = members.find((m) => m.isHost);
@@ -155,7 +160,10 @@ function RoomSession() {
   return (
     <div className="page room">
       <header className="room__head">
-        <p className="room__kind"><span className="room__live" aria-hidden="true" /> Live room</p>
+        <p className="room__kind">
+          <span className="room__live" aria-hidden="true" /> Live room
+          <span className="room__tag">{visibility === VISIBILITY.FRIENDS ? "Friends only" : "Anyone with the link"}</span>
+        </p>
         <h1 className="page__title room__code">{code}</h1>
         <p className="room__lede">
           {isHost ? "You're the host. Play anything and everyone here hears it." : `${host?.name || "The host"} is choosing the music.`}
@@ -169,6 +177,16 @@ function RoomSession() {
           </button>
         </div>
       </header>
+
+      {isHost ? (
+        <section className="room__now">
+          <h2 className="room__subhead">Who can join</h2>
+          <VisibilityPicker
+            value={visibility}
+            onChange={(next) => setVisibility(next).catch(() => toast("Couldn't change who can join.", { tone: "error" }))}
+          />
+        </section>
+      ) : null}
 
       {needsTap ? (
         <button type="button" className="room__tap" onClick={sync}>
@@ -217,6 +235,30 @@ function RoomSession() {
           ))}
         </ul>
       </section>
+    </div>
+  );
+}
+
+function VisibilityPicker({ value, onChange }) {
+  const options = [
+    { id: VISIBILITY.PUBLIC, label: "Anyone with the link", hint: "Share the code with anyone." },
+    { id: VISIBILITY.FRIENDS, label: "Friends only", hint: "Only your friends can join." },
+  ];
+  return (
+    <div className="room__visibility" role="radiogroup" aria-label="Who can join">
+      {options.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          role="radio"
+          aria-checked={value === o.id}
+          className={`room__visibility-option${value === o.id ? " is-active" : ""}`}
+          onClick={() => onChange(o.id)}
+        >
+          <strong>{o.label}</strong>
+          <small>{o.hint}</small>
+        </button>
+      ))}
     </div>
   );
 }

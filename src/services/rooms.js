@@ -4,6 +4,7 @@
  *
  *   rooms/{code}
  *     hostUid, createdAt
+ *     visibility: "public" (anyone with the code) | "friends" (host's friends only)
  *     state:   { trackId, track, isPlaying, position, updatedAt }
  *     members: { [uid]: { name, photo, joinedAt } }
  *
@@ -60,18 +61,22 @@ function memberInfo(user) {
   };
 }
 
-export async function createRoom(user) {
+export const VISIBILITY = { PUBLIC: "public", FRIENDS: "friends" };
+
+export async function createRoom(user, visibility = VISIBILITY.PUBLIC) {
   const { mod, db } = await rtdb();
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const code = newCode();
     const roomRef = mod.ref(db, `rooms/${code}`);
+    // A friends-only room we can't read is taken too.
     // eslint-disable-next-line no-await-in-loop
-    const existing = await mod.get(roomRef);
-    if (existing.exists()) continue;
+    const taken = await mod.get(roomRef).then((s) => s.exists(), () => true);
+    if (taken) continue;
     // eslint-disable-next-line no-await-in-loop
     await mod.set(roomRef, {
       hostUid: user.uid,
       createdAt: mod.serverTimestamp(),
+      visibility,
       state: { trackId: "", isPlaying: false, position: 0, updatedAt: mod.serverTimestamp() },
       members: { [user.uid]: memberInfo(user) },
     });
@@ -87,7 +92,12 @@ export async function createRoom(user) {
 export async function joinRoom(code, user, onRoom, onError) {
   const { mod, db } = await rtdb();
   const roomRef = mod.ref(db, `rooms/${code}`);
-  const snapshot = await mod.get(roomRef);
+  const snapshot = await mod.get(roomRef).catch((error) => {
+    if (error?.code === "PERMISSION_DENIED" || /permission/i.test(error?.message || "")) {
+      throw new Error("This room is for the host's friends only.");
+    }
+    throw error;
+  });
   if (!snapshot.exists()) return null;
 
   const isHost = snapshot.val().hostUid === user.uid;
@@ -122,6 +132,11 @@ export async function joinRoom(code, user, onRoom, onError) {
 export async function publishState(code, state) {
   const { mod, db } = await rtdb();
   await mod.set(mod.ref(db, `rooms/${code}/state`), { ...state, updatedAt: mod.serverTimestamp() });
+}
+
+export async function setRoomVisibility(code, visibility) {
+  const { mod, db } = await rtdb();
+  await mod.set(mod.ref(db, `rooms/${code}/visibility`), visibility);
 }
 
 export async function endRoom(code) {
