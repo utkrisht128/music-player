@@ -134,11 +134,12 @@
     -webkit-backdrop-filter: saturate(160%) blur(20px);
     user-select: none;
   }
-  .mobile-nav__link { gap: 2px; font-size: 11px; color: var(--text-muted); transition: color var(--t-fast) var(--ease); }
+  .mobile-nav__link { min-width: 0; gap: 2px; font-size: 11px; color: var(--text-muted); transition: color var(--t-fast) var(--ease); }
   .mobile-nav__icon {
     display: grid;
     place-items: center;
-    width: 56px;
+    width: 100%;
+    max-width: 56px;
     height: 30px;
     border-radius: var(--r-pill);
     transition: background var(--t-med) var(--ease), transform var(--t-fast) var(--ease);
@@ -301,3 +302,15 @@
 }
 .quick__art--ai { background: linear-gradient(135deg, #a855f7, #ec4899); }
 .quick__art--room { background: linear-gradient(135deg, #10b981, #0ea5e9); }
+
+/* Phones: the AI wizard's stepper shows only the current step's label, so it
+   is readable instead of every label being cut to a letter. */
+@media (max-width: 600px) {
+  .ai-stepper li { flex: 0 0 auto; }
+  .ai-stepper li.is-now { flex: 1 1 auto; }
+  .ai-stepper li:not(.is-now) .ai-stepper__label { display: none; }
+  .quota { flex-wrap: nowrap; }
+  .quota__bar { width: 40px; flex-shrink: 0; }
+  .quota__reset { white-space: nowrap; }
+  .search__kbd { display: none; }
+}
