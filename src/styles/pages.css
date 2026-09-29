@@ -16,7 +16,7 @@
   font-size: var(--fs-sm);
 }
 
-.page--collection { padding-top: 0; }
+.page.page--collection { padding-top: 0; }
 
 .home__greeting { margin-bottom: var(--s6); }
 
