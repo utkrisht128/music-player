@@ -175,6 +175,18 @@ export default function SettingsPage() {
       <section className="settings__group">
         <h2 className="settings__heading">Playback</h2>
         <Toggle
+          label="Background playback"
+          description="Keep music playing when screen is locked or app is in the background."
+          checked={settings.backgroundPlay}
+          onChange={(backgroundPlay) => settings.update({ backgroundPlay })}
+        />
+        <Toggle
+          label="Keep screen awake"
+          description="Prevent the screen from dimming or going to sleep while music is playing."
+          checked={settings.keepAwake}
+          onChange={(keepAwake) => settings.update({ keepAwake })}
+        />
+        <Toggle
           label="Autoplay"
           description="When your queue ends, keep playing similar songs."
           checked={settings.autoplay}

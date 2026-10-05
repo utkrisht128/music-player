@@ -51,7 +51,7 @@ function loadSettings() {
 export function PlayerProvider({ children }) {
   const { recordPlay } = useLibrary();
   const { toast } = useUI();
-  const { autoplay, crossfade } = useSettings();
+  const { autoplay, crossfade, backgroundPlay, keepAwake } = useSettings();
 
   // Both are created once and never recreated. useRef(expr) would re-evaluate
   // the expression on every render and throw the result away, which for
@@ -63,6 +63,12 @@ export function PlayerProvider({ children }) {
   const managerRef = useRef(null);
   if (managerRef.current === null) managerRef.current = new AudioManager();
   const manager = managerRef.current;
+
+  useEffect(() => {
+    if (manager && typeof manager.setBackgroundPlay === "function") {
+      manager.setBackgroundPlay(backgroundPlay);
+    }
+  }, [manager, backgroundPlay]);
 
   const [queue, setQueue] = useState([]);
   const [index, setIndex] = useState(0);
@@ -80,6 +86,50 @@ export function PlayerProvider({ children }) {
   const [sleep, setSleep] = useState(null);
   // { id, at }: seconds to jump to once that track starts (see playFrom).
   const startAtRef = useRef(null);
+
+  // ---------------------------------------------------- Screen Wake Lock
+  const wakeLockRef = useRef(null);
+  useEffect(() => {
+    if (!keepAwake || !isPlaying) {
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {});
+        wakeLockRef.current = null;
+      }
+      return undefined;
+    }
+
+    let isMounted = true;
+    const requestLock = async () => {
+      if ("wakeLock" in navigator && !wakeLockRef.current) {
+        try {
+          const lock = await navigator.wakeLock.request("screen");
+          if (isMounted) wakeLockRef.current = lock;
+          else lock.release().catch(() => {});
+        } catch (e) {
+          /* wake lock failed or unsupported */
+        }
+      }
+    };
+
+    requestLock();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && keepAwake && isPlaying) {
+        requestLock();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      isMounted = false;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {});
+        wakeLockRef.current = null;
+      }
+    };
+  }, [keepAwake, isPlaying]);
 
   const currentTrack = queue[index] || null;
 
@@ -505,14 +555,39 @@ export function PlayerProvider({ children }) {
   const controlsRef = useRef({});
   useEffect(() => {
     if (!ms || !currentTrack) return;
-    ms.metadata = new window.MediaMetadata({
-      title: currentTrack.title,
-      artist: (currentTrack.artists || []).join(", "),
-      album: currentTrack.albumTitle || "",
-      artwork: currentTrack.artwork
-        ? [{ src: new URL(currentTrack.artwork, window.location.href).href, sizes: "512x512" }]
-        : [],
-    });
+    let artworkUrl = null;
+    if (currentTrack.artwork) {
+      try {
+        artworkUrl = currentTrack.artwork.startsWith("http")
+          ? currentTrack.artwork
+          : new URL(currentTrack.artwork, window.location.href).href;
+      } catch (e) {
+        artworkUrl = null;
+      }
+    }
+    const artworkList = artworkUrl
+      ? [
+          { src: artworkUrl, sizes: "96x96" },
+          { src: artworkUrl, sizes: "128x128" },
+          { src: artworkUrl, sizes: "192x192" },
+          { src: artworkUrl, sizes: "256x256" },
+          { src: artworkUrl, sizes: "384x384" },
+          { src: artworkUrl, sizes: "512x512" },
+        ]
+      : [];
+
+    try {
+      ms.metadata = new window.MediaMetadata({
+        title: currentTrack.title || "Unknown Track",
+        artist: Array.isArray(currentTrack.artists)
+          ? currentTrack.artists.join(", ")
+          : currentTrack.artist || "Unknown Artist",
+        album: currentTrack.albumTitle || currentTrack.album || "",
+        artwork: artworkList,
+      });
+    } catch (e) {
+      /* ignore */
+    }
   }, [ms, currentTrack]);
 
   useEffect(() => {

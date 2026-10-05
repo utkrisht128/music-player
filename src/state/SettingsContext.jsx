@@ -33,6 +33,8 @@ const DEFAULTS = {
   compact: false, // denser track lists
   reduceMotion: false, // disable animations regardless of OS setting
   greetingName: "", // shown on Home ("Good evening, …"); empty = account name
+  backgroundPlay: true, // keep playing audio when screen is locked or tab is in background
+  keepAwake: false, // prevent screen from sleeping while music is playing
 };
 
 const pick = (value, allowed, fallback) => (allowed.includes(value) ? value : fallback);
@@ -49,6 +51,8 @@ function load() {
     compact: bool(saved.compact, DEFAULTS.compact),
     reduceMotion: bool(saved.reduceMotion, DEFAULTS.reduceMotion),
     greetingName: typeof saved.greetingName === "string" ? saved.greetingName.slice(0, 40) : DEFAULTS.greetingName,
+    backgroundPlay: bool(saved.backgroundPlay, DEFAULTS.backgroundPlay),
+    keepAwake: bool(saved.keepAwake, DEFAULTS.keepAwake),
   };
 }
 

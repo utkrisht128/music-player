@@ -15,6 +15,7 @@
 import YouTubeManager from "./YouTubeManager";
 
 const YT_PREFIX = "youtube:";
+const SILENT_WAV = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==";
 
 const EVENTS = [
   "play",
@@ -32,6 +33,15 @@ const EVENTS = [
 export default class AudioManager {
   constructor() {
     this.audio = typeof Audio !== "undefined" ? new Audio() : null;
+    // Silent audio element acts as an active audio anchor to preserve background process privileges
+    // on mobile browsers (iOS Safari, Android Chrome) during YouTube iframe playback.
+    this.silentAudio = typeof Audio !== "undefined" ? new Audio(SILENT_WAV) : null;
+    if (this.silentAudio) {
+      this.silentAudio.loop = true;
+      this.silentAudio.volume = 0.01;
+    }
+    this.backgroundPlayEnabled = true;
+
     this.listeners = new Map(EVENTS.map((name) => [name, new Set()]));
     this.currentSrc = null;
     // Guards against the browser AbortError raised when a pending play()
@@ -70,6 +80,27 @@ export default class AudioManager {
       this.emitAudio("loading", false);
       this.emitAudio("error", this.describeError(this.audio.error));
     });
+  }
+
+  setBackgroundPlay(enabled) {
+    this.backgroundPlayEnabled = Boolean(enabled);
+    if (!this.backgroundPlayEnabled) {
+      this.stopSilentAnchor();
+    } else if (this.mode === "youtube" && this.youtube.wantPlay) {
+      this.startSilentAnchor();
+    }
+  }
+
+  startSilentAnchor() {
+    if (this.silentAudio && this.backgroundPlayEnabled) {
+      this.silentAudio.play().catch(() => {});
+    }
+  }
+
+  stopSilentAnchor() {
+    if (this.silentAudio) {
+      this.silentAudio.pause();
+    }
   }
 
   /** Turns a MediaError code into something a listener can act on. */
@@ -126,7 +157,10 @@ export default class AudioManager {
       return true;
     }
 
-    if (this.mode === "youtube") this.youtube.stop();
+    if (this.mode === "youtube") {
+      this.youtube.stop();
+      this.stopSilentAnchor();
+    }
     this.mode = "audio";
     this.audio.src = src;
     this.audio.load();
@@ -142,9 +176,11 @@ export default class AudioManager {
    */
   async play() {
     if (this.mode === "youtube") {
+      this.startSilentAnchor();
       await this.youtube.play();
       return true;
     }
+    this.stopSilentAnchor();
     if (!this.audio || !this.currentSrc) return false;
     const token = this.playToken;
     try {
@@ -163,6 +199,7 @@ export default class AudioManager {
   }
 
   pause() {
+    this.stopSilentAnchor();
     if (this.mode === "youtube") this.youtube.pause();
     else if (this.audio) this.audio.pause();
   }
@@ -205,6 +242,7 @@ export default class AudioManager {
   }
 
   destroy() {
+    this.stopSilentAnchor();
     if (!this.audio) return;
     this.audio.pause();
     this.audio.src = "";

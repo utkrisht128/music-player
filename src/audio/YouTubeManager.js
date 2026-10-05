@@ -70,6 +70,25 @@ export default class YouTubeManager {
     this.timer = null;
     this.readyPromise = null;
     this.startCheck = null;
+    this.resumeTimer = null;
+
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", () => {
+        if (this.wantPlay && this.ready && this.player) {
+          const S = window.YT?.PlayerState;
+          if (S && typeof this.player.getPlayerState === "function") {
+            const state = this.player.getPlayerState();
+            if (state !== S.PLAYING && state !== S.BUFFERING) {
+              try {
+                this.player.playVideo();
+              } catch (e) {
+                /* ignore */
+              }
+            }
+          }
+        }
+      });
+    }
   }
 
   init() {
@@ -115,7 +134,21 @@ export default class YouTubeManager {
       this.startTicking();
     } else if (state === S.PAUSED) {
       this.stopTicking();
-      // YouTube pauses itself (e.g. tab backgrounded on mobile); report it.
+      // If the listener intended to play (wantPlay is true), but YouTube/browser auto-paused
+      // (e.g. screen off or tab hidden on mobile), attempt background auto-resume.
+      if (this.wantPlay && typeof document !== "undefined" && document.hidden) {
+        if (this.resumeTimer) clearTimeout(this.resumeTimer);
+        this.resumeTimer = setTimeout(() => {
+          if (this.wantPlay && this.ready && this.player) {
+            try {
+              this.player.playVideo();
+            } catch (e) {
+              /* ignore */
+            }
+          }
+        }, 120);
+        return;
+      }
       this.emit("pause");
     } else if (state === S.BUFFERING) {
       this.emit("loading", true);
@@ -197,6 +230,7 @@ export default class YouTubeManager {
 
   pause() {
     this.clearStartCheck();
+    if (this.resumeTimer) clearTimeout(this.resumeTimer);
     this.wantPlay = false;
     this.stopTicking();
     if (this.ready) this.player.pauseVideo();
@@ -204,6 +238,7 @@ export default class YouTubeManager {
 
   stop() {
     this.clearStartCheck();
+    if (this.resumeTimer) clearTimeout(this.resumeTimer);
     this.wantPlay = false;
     this.videoId = null;
     this.stopTicking();
