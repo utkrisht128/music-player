@@ -41,6 +41,8 @@ export default class AudioManager {
       this.silentAudio.volume = 0.01;
     }
     this.backgroundPlayEnabled = true;
+    this.isUnlocked = false;
+    this.setupAudioUnlock();
 
     this.listeners = new Map(EVENTS.map((name) => [name, new Set()]));
     this.currentSrc = null;
@@ -82,11 +84,43 @@ export default class AudioManager {
     });
   }
 
+  setupAudioUnlock() {
+    if (typeof window === "undefined") return;
+    const unlock = () => {
+      if (this.isUnlocked) return;
+      this.isUnlocked = true;
+
+      // Unlock silent audio anchor for background OS privilege
+      if (this.silentAudio) {
+        this.silentAudio.play().then(() => {
+          if (this.mode !== "youtube" || !this.youtube?.wantPlay) {
+            this.silentAudio.pause();
+          }
+        }).catch(() => {});
+      }
+
+      // Unlock main HTML5 audio element
+      if (this.audio && !this.currentSrc) {
+        this.audio.play().then(() => {
+          this.audio.pause();
+        }).catch(() => {});
+      }
+
+      window.removeEventListener("touchstart", unlock, true);
+      window.removeEventListener("touchend", unlock, true);
+      window.removeEventListener("click", unlock, true);
+    };
+
+    window.addEventListener("touchstart", unlock, true);
+    window.addEventListener("touchend", unlock, true);
+    window.addEventListener("click", unlock, true);
+  }
+
   setBackgroundPlay(enabled) {
     this.backgroundPlayEnabled = Boolean(enabled);
     if (!this.backgroundPlayEnabled) {
       this.stopSilentAnchor();
-    } else if (this.mode === "youtube" && this.youtube.wantPlay) {
+    } else if (this.youtube?.wantPlay || (this.audio && !this.audio.paused)) {
       this.startSilentAnchor();
     }
   }
